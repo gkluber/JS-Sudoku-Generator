@@ -1,0 +1,42 @@
+.guess{
+	color:green;
+}
+.hint{
+	color:black;
+	font-weight:bold;
+}
+.hspacer{
+	height:1px;
+	background-color:black;
+}
+.vspacer{
+	width:1px;
+	background-color:black;
+}
+#selection{
+	background-color:#00FF00;
+}
+#wrong{
+	background-color:red;
+}
+td{
+	width:25px;
+	height:25px;
+	text-align:center;
+	background-color:white;
+}
+
+table{
+	border:1px solid #000000;
+	background-color:black;
+	margin:auto;
+}
+
+h1{
+	padding-top:20px;
+	padding-left:5px;
+	padding-right:5px;
+	margin:auto;
+	text-align:center;
+	background-color:gray;
+}

@@ -1,0 +1,89 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Sudoku</title>
+  <meta name="description" content="Sudoku Puzzle Generator">
+  <meta name="author" content="Grant Kluber">
+
+  <link rel="stylesheet" href="styles.css?v=1.0">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  
+</head>
+
+<body>
+  <script src="scripts/checker.js"></script>
+  <script src="scripts/generator.js"></script>
+  <script src="scripts/interface.js"></script>
+  <h1>Sudoku Interface</h1>
+  <p></p>
+  <script>
+    //generate trivial sudoku solution
+    var grid = new Array(), offset=0;
+	for(var i=0; i<9; i++)
+	{
+	    grid.push([]);
+		for(var j=0; j<9; j++)
+		{
+			if(j==3)
+			{
+				grid[i].push(0);
+				continue;
+			}
+			grid[i].push((j+offset)%9+1);
+		}
+		offset+=3;
+		if(i%3==2)
+			offset+=1;
+	}
+	//grid = randomize(grid,1000);
+	setGrid(grid);
+	setInterval(update,50);
+	
+	$("body").keydown(function(event){
+	  //left
+	  if(event.which===37)
+	    select(xCur,yCur==0?yCur:(yCur-1));
+	  //right
+	  else if(event.which===39)
+	    select(xCur,yCur==8?yCur:(yCur+1));
+	  //up
+	  else if(event.which===38)
+	    select(xCur==0?xCur:(xCur-1),yCur);
+	  //down
+	  else if(event.which===40)
+	    select(xCur==8?xCur:(xCur+1),yCur);
+		
+	  //check for numbers
+	  else if(event.which>=49&&event.which<=57)
+	  {
+	    var num = event.which - 48;
+		proposeChange(xCur,yCur,num);
+	  }
+	  //numpad
+	  else if(event.which>=97&&event.which<=105)
+	  {
+	    var num = event.which - 96;
+		proposeChange(xCur,yCur,num);
+	  }
+	});
+	setTimeout(function()
+	{
+	  $(document).ready(function(){
+	    $("td").click(function(event){
+	      var clazz = $(event.target).attr("class");
+	      var split = clazz.split(" ");
+		  if(split.length!=3)
+		    return;
+	      var x = parseInt(split[1].substring(1,2)), y = parseInt(split[2].substring(1,2));
+	      select(x,y);
+	    });
+	  });
+	}, 100);
+	
+	
+  </script>
+</body>
+</html>
