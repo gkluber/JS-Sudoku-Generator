@@ -14,14 +14,18 @@
 </head>
 
 <body>
-  <script src="scripts/checker.js"></script>
   <script src="scripts/generator.js"></script>
   <script src="scripts/interface.js"></script>
   <h1>Sudoku Interface</h1>
   <p></p>
+  <button id="easy">Easy</button>
+  <button id="medium">Medium</button>
+  <button id="hard">Hard</button>
+  <button id="veryhard">Very Hard</button>
+  <button id="insane">Insane</button>
   <script>
     //generate trivial sudoku solution
-    var grid = new Array(), offset=0;
+    /*var grid = new Array(), offset=0;
 	for(var i=0; i<9; i++)
 	{
 	    grid.push([]);
@@ -37,9 +41,9 @@
 		offset+=3;
 		if(i%3==2)
 			offset+=1;
-	}
+	}*/
 	//grid = randomize(grid,1000);
-	setGrid(grid);
+	generateEasy();
 	setInterval(update,50);
 	
 	$("body").keydown(function(event){
@@ -69,6 +73,22 @@
 		proposeChange(xCur,yCur,num);
 	  }
 	});
+	
+	$("button").click(function(event){
+		var id = $(event.target).attr("id");
+		clear();
+		if(id=="easy")
+			generateEasy();
+		else if(id=="medium")
+			generateMedium();
+		else if(id=="hard")
+			generateHard();
+		else if(id=="veryhard")
+			generateVeryHard();
+		else
+			generateInsane();
+	});
+	
 	setTimeout(function()
 	{
 	  $(document).ready(function(){

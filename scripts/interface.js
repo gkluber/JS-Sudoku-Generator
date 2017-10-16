@@ -93,6 +93,19 @@ var isHint = function(cx,cy)
 	return true;
 }
 
+var clear = function()
+{
+	grid = new Array(9);
+	for(var i=0; i<9; i++)
+		grid[i] = new Array(9);
+	wrong = [];
+	hist = []
+	pencilmarks = []
+	xCur = 0;
+	yCur = 0;
+	$("table").remove();
+}
+
 var proposeChange = function(cx,cy,v)
 {
 	var change = getChange(cx,cy,v);

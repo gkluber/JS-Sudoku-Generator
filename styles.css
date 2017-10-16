@@ -13,11 +13,34 @@
 	width:1px;
 	background-color:black;
 }
+button{
+	width:60px;
+	height:60px;
+	margin:auto;
+	float: right;
+	z-index: 1;
+	text-align:center;
+}
 #selection{
 	background-color:#00FF00;
 }
 #wrong{
 	background-color:red;
+}
+#easy{
+	background-color:green;
+}
+#medium{
+	background-color:yellow;
+}
+#hard{
+	background-color:red;
+}
+#veryhard{
+	background-color:crimson;
+}
+#insane{
+	background-color:purple;
 }
 td{
 	width:25px;
@@ -29,7 +52,12 @@ td{
 table{
 	border:1px solid #000000;
 	background-color:black;
-	margin:auto;
+	z-index:0;
+	position: absolute;
+    top: 60%;  /* position the top  edge of the element at the middle of the parent */
+    left: 50%; /* position the left edge of the element at the middle of the parent */
+
+    transform: translate(-50%, -50%); /* centers */
 }
 
 h1{
@@ -39,4 +67,7 @@ h1{
 	margin:auto;
 	text-align:center;
 	background-color:gray;
+	-moz-box-shadow: inset 2px 2px 2px rgba(255, 255, 255, .4), inset -2px -2px 2px rgba(0, 0, 0, .4);
+    -webkit-box-shadow: inset 2px 2px 2px rgba(255, 255, 255, .4), inset -2px -2px 2px rgba(0, 0, 0, .4);
+    box-shadow: inset 2px 2px 2px rgba(255, 255, 255, .4), inset -2px -2px 2px rgba(0, 0, 0, .4);
 }
