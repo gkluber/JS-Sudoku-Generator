@@ -87,9 +87,9 @@
 			generateVeryHard();
 		else
 			generateInsane();
+		setTimeout(selector,100);
 	});
-	
-	setTimeout(function()
+	var selector = function()
 	{
 	  $(document).ready(function(){
 	    $("td").click(function(event){
@@ -101,7 +101,8 @@
 	      select(x,y);
 	    });
 	  });
-	}, 100);
+	 };
+	setTimeout(selector, 100);
 	
 	
   </script>
