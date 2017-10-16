@@ -128,7 +128,7 @@ var proposeChange = function(cx,cy,v)
 		//check if puzzle completed
 		if(checkComplete())
 		{
-			alert('congrats bud');
+			alert('Congratulations!');
 		}
 		return true;
 	}
