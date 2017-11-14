@@ -1,6 +1,6 @@
 //returns 9x9 grid of numbers, with 0 equal to null
 var inverseMethods = [];
-var forwardMethods = [];
+var forwardMethods = [sc,em,bi,cs,xw];
 var values = [1,2,3,4,5,6,7,8,9];
 
 //value is the value of the cell, 0 for null.
@@ -15,14 +15,14 @@ var generatePuzzle = function()
 	grid = new Array(9);
 	for(var i=0; i<grid.length; i++)
 		grid[i] = new Array(9);
-	var offset =0;
+	var offset =Math.round(Math.random()*9);
 	
 	//generate trivial sudoku solution
 	for(var i=0; i<9; i++)
 	{
 		for(var j=0; j<9; j++)
 		{
-			grid[i][j] = new Cell((j+offset)%9+1, []);
+			grid[i][j] = (j+offset)%9+1;
 		}
 		offset+=3;
 		if(i%3==2)
@@ -31,6 +31,12 @@ var generatePuzzle = function()
 	
 	//randomize the solution
 	grid = randomize(grid,1000);
+	
+	//initalize cell objects
+	for(var i=0; i<9; i++)
+		for(var j=0; j<9; j++)
+			grid[i][j] = new Cell(grid[i][j],new Set());
+	
 }
 
 //grid as number matrix... no use of cell class
@@ -150,6 +156,30 @@ var cloneMatrix = function(matrix)
 	return mat;
 }
 
+var cloneSet = function(set)
+{
+	var result = new Set();
+	for(val of set.values())
+		result.add(val);
+	return result;
+		
+}
+
+var cloneBoard = function(board)
+{
+	var mat = [];
+	for(var i=0; i<matrix.length; i++)
+	{
+		mat.push([]);
+		//TODO SET VS ARRAY
+		for(var j=0; j<matrix[i].length; j++)
+			mat[i].push(new Cell(matrix[i][j].value,cloneSet(matrix[i][j].marks)));
+	}
+	return mat;
+}
+
+
+
 //these functions get random puzzle from difficulty
 var generateEasy = function(){
 	process(easy);
@@ -198,29 +228,125 @@ var sc = function(board)
 {
 	var results = [];
 	for(var i=0; i<8; i++)
-		for(var j=0; j<8; j++)
-		{
-			//if(board[i][j]
-			
+		for(var j=0; j<8; j++){
+			var cell = board[i][j];
+			if(cell.value===0&&cell.marks.length===1&&cell.value===cell.marks[0]){
+				var add = cloneBoard(board);
+				var newCell = add[i][j];
+				newCell.value = cell.marks[0];
+				newCell.marks = [];
+				results.push(add);
+			}
 		}
-		
+	return results;
 }
 
 //exclusion method
 var em = function(board){
-	
+	var results = [];
+	for(var i=0; i<8; i++)
+		for(var j=0; j<8; j++){
+			var cell = board[i][j];
+			for(var neighbor in getSector(cell))
+				if(cell.marks.has(neighbor.value)){
+					var add = cloneBoard(board);
+					var newCell = add[i][j];
+					newCell.marks.delete(neighbor.value);
+					results.add(add);
+				}
+		}
+	return results;
 }
 
-//block intersection
+//block intersection 
+
+/* BELOW CODE IS INCORRECT
 var bi = function(board)
 {
-	
-}
+	var results = [];
+	for(var i=0; i<8; i++)
+		for(var j=0; j<8; j++){
+			var cell = board[i][j];
+			for(var neighbor in getSector(cell))
+				if(cell.marks.has(neighbor.value)){
+					var add = cloneBoard(board);
+					var newCell = add[i][j];
+					newCell.marks.delete(neighbor.value);
+					results.add(add);
+				}
+		}
+	return results;
+}*/ 
 
 //covering set
 var cs = function(board)
 {
-	
+	var results = [];
+	for(var i=0; i<8; i++)
+		for(var j=0; j<8; j++){
+			var cell = board[i][j];
+			var maps = [getIncrementedMap(getRowSet(cell),cell), getIncrementedMap(getColSet(cell),cell), getIncrementedMap(getBlockSet(cell),cell)];
+			//direct sum of incremented map from all 
+			var partials = [];
+			maps.forEach(function(element){partials.push(partialCs(cell,element))});
+			for(partial in partials)
+				for(newBoard in partial)
+					results.push(newBoard);
+		}
+}
+
+var partialCs = function(cell, map)
+{
+	var results = [];
+	for(entry of map.entries()){
+		var key = entry[0], value = entry[1];
+		if(key.size==value)
+		{
+			var add = cloneBoard(board);
+			var newCell = add[i][j];
+			//then subset found that may conflict with the current cell
+			var deleted = false;
+			for(value in key)
+				if(newCell.marks.has(value))
+				{
+					newCell.marks.delete(value)
+					deleted = true;
+				}
+			
+			//change was made to the board if deleted = true
+			if(deleted)
+				results.add(add);
+		}
+	}
+	return results;
+}
+
+//neighbors passed as array and cell passed as Cell
+var getIncrementedMap = function(neighbors, cell)
+{
+	map = new Map();
+	for(var n in neighbors)
+	{
+		boolean contains = false;
+		for(key of map.keys())
+			if(setEquals(key,cell.marks))
+				contains = true;
+		
+		if(contains)
+			map.set(n.marks,map.get(n.marks));
+		else
+			map.set(n.marks,1)
+	}
+}
+
+var setEquals = function(s1,s2)
+{
+	if(s1.size!=s2.size)
+		return false;
+	for(e in s1)
+		if(!s2.has(e))
+			return false;
+	return true;
 }
 
 //x-wing 
@@ -235,12 +361,39 @@ var xw = function(board)
 //inverse single candidate method
 var isc = function(board)
 {
-	
+	var results = [];
+	for(var i=0; i<8; i++)
+		for(var j=0; j<8; j++){
+			var cell = board[i][j];
+			if(cell.marks.size == 0 && cell.value!=0)
+			{
+				var add = cloneBoard(board);
+				var newCell = add[i][j];
+				newCell.marks.add(cell.value);
+				newCell.value = 0;
+				results.add(add);
+			}
+		}
+	return results;
 }
 
 //inverse exclusion method
 var iem = function(board){
-	
+	var results = [];
+	for(var i=0; i<8; i++)
+		for(var j=0; j<8; j++){
+			var cell = board[i][j];
+			if(cell.marks.size!=0 && cell.value==0)
+				for(target in getSector(board,i,j))
+					if(target.marks.has(cell.value))
+					{
+						var add = cloneBoard(board);
+						var newCell = add[i][j];
+						newCell.marks.add(target.value);
+						results.add(add);
+					}
+		}
+	return results;
 }
 
 //inverse block intersection
@@ -257,6 +410,14 @@ var ics = function(board)
 
 //inverse x-wing 
 var ixw = function(board)
+{
+	
+}
+
+//SELECTOR--APPLIES THE HEURISTIC FUNCTION BASED ON THE CRITERIA GIVEN
+//functions as a sequential search in the child space
+
+var selector = function(boardList)
 {
 	
 }

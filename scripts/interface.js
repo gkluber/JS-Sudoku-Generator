@@ -17,65 +17,12 @@ var getChange = function(cx, cy, v)
 	return {"x":cx,"y":cy,"value":v};
 }
 
-var getBlockSet = function(cx,cy)
-{
-	var set = new Array();
-	var bx = 3*Math.floor(cx/3.0), by = 3*Math.floor(cy/3.0);
-	for(var i=0; i<3; i++)
-		for(var j=0; j<3; j++)
-		{
-			if(bx+i==cx&&by+j==cy)
-				continue;
-			set.push(grid[bx+i][by+j]);
-		}
-	return set;
-}
-
-var getRowSet = function(cx,cy)
-{
-	var set = new Array();
-	for(var i=0; i<9; i++)
-	{
-		if(i==cx)
-			continue;
-		set.push(grid[i][cy]);
-	}
-	return set;
-}
-
-var getColSet = function(cx,cy)
-{
-	var set = new Array();
-	for(var i=0; i<9; i++)
-	{
-		if(i==cy)
-			continue;
-		set.push(grid[cx][i]);
-	}
-	return set;
-}
-
-//set is array of arrays
-var combineSets = function(sets)
-{
-	var unrolled = new Array();
-	for(var i=0; i<sets.length; i++)
-		for(var j=0; j<sets[i].length; j++)
-			unrolled.push(sets[i][j]);
-	return unrolled;
-}
-
-var getSector = function(cx,cy)
-{
-	return combineSets([getBlockSet(cx,cy),getRowSet(cx,cy),getColSet(cx,cy)]);
-}
-
 var isValid = function(change)
 {
 	var cx = change.x, cy = change.y, v = change.value;
 	//check to see if cell has been changed before, indicating that it is not a hint
 	
-	if(getSector(cx,cy).includes(v))
+	if(getSector(grid,cx,cy).includes(v))
 		return false;
 	return true;
 }
@@ -128,7 +75,7 @@ var proposeChange = function(cx,cy,v)
 		//check if puzzle completed
 		if(checkComplete())
 		{
-			alert('Congratulations!');
+			alert('congrats bud');
 		}
 		return true;
 	}
