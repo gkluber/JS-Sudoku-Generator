@@ -5,9 +5,11 @@ var values = [1,2,3,4,5,6,7,8,9];
 
 //value is the value of the cell, 0 for null.
 //marks is the list of pencil marks
-function Cell(value, marks) {
+function Cell(value, marks, x, y) {
     this.value = value;
     this.marks = marks;
+	this.x = x;
+	this.y = y;
 }
 
 var generatePuzzle = function()
@@ -260,7 +262,7 @@ var em = function(board){
 
 //block intersection 
 
-/* BELOW CODE IS INCORRECT
+/* COMMENTED-OUT CODE IS INCORRECT
 var bi = function(board)
 {
 	var results = [];
@@ -277,6 +279,107 @@ var bi = function(board)
 		}
 	return results;
 }*/ 
+
+var bi = function(board)
+{
+	var results = [];
+	var partials = [partialBi(board, true), partialBi(board, false)];
+	for(partial in partials)
+		for(newBoard in partial)
+			results.push(newBoard);
+	return results;
+}
+
+//if row true then iterate over rows, otherwise use col
+var partialBi = function(board, row)
+{
+	var results = [];
+	for(var i=0; i<8; i++)
+	{
+		/*for(num in values)
+		{
+			var blocks = new Set();
+			for(var j=0; j<8; j++)
+				if(grid[j][i].value==num)
+					blocks.add(Math.floor(j/3));
+				
+			var candidates = [];
+			if(blocks.size==1)
+				for(cell of getBlockSet(board, row?i:blocks.values().next()*3, row?blocks.values().next()*3:i).values())
+					if(cell.marks.has(num))
+					{
+						var add = cloneBoard(board);
+						var newCell = add[cell.x][cell.y];
+						newCell.marks.delete(num);
+						results.push(add);
+					}
+		}*/
+		//cells = row?getRowSet(0,i):getColSet(i,0);
+		//sort by number of marks
+		//cells = quickSort(cells, 0, cells.length - 1);
+		//hiddenSubsets = new Map();
+		
+		
+	}
+	return results;
+}
+
+var partition = function(cells, left, right) 
+{
+
+    var pivot = cells[Math.floor((right + left) / 2)],
+        i = left,
+        j = right;
+
+
+    while (i <= j) 
+	{
+
+        while (cells[i].marks.size > pivot.marks.size) 
+		{
+            i++;
+        }
+
+        while (cells[j].marks.size < pivot.marks.size) 
+		{
+            j--;
+        }
+
+        if (i <= j) 
+		{
+            swap(cells, i, j);
+            i++;
+            j--;
+        }
+    }
+
+    return i;
+}
+
+//sorts in descending order
+var quickSort = function(cells, left, right) 
+{
+
+    var index;
+
+    if (cells.length > 1) {
+
+        index = partition(cells, left, right);
+
+        if (left < index - 1) 
+		{
+            quickSort(cells, left, index - 1);
+        }
+
+        if (index < right) 
+		{
+            quickSort(cells, index, right);
+        }
+
+    }
+
+    return cells;
+}
 
 //covering set
 var cs = function(board)
@@ -325,12 +428,14 @@ var partialCs = function(cell, map)
 var getIncrementedMap = function(neighbors, cell)
 {
 	map = new Map();
+	neighbors = quickSort(Array.from(neighbors));
 	for(var n in neighbors)
 	{
-		boolean contains = false;
+		boolean contains = true;
 		for(key of map.keys())
-			if(setEquals(key,cell.marks))
-				contains = true;
+			for(mark in n.marks)
+				if(!key.has(mark))
+					contains = false;
 		
 		if(contains)
 			map.set(n.marks,map.get(n.marks));

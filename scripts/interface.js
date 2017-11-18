@@ -22,14 +22,14 @@ var isValid = function(change)
 	var cx = change.x, cy = change.y, v = change.value;
 	//check to see if cell has been changed before, indicating that it is not a hint
 	
-	if(getSector(grid,cx,cy).includes(v))
+	if(has(getSector(grid,cx,cy),v))
 		return false;
 	return true;
 }
 
 var isHint = function(cx,cy)
 {
-	if(grid[cx][cy]===0)
+	if(grid[cx][cy].value===0)
 		return false;
 	for(var i=0; i<hist.length; i++)
 	{
@@ -40,11 +40,22 @@ var isHint = function(cx,cy)
 	return true;
 }
 
+//accepts input as set of Cell objects
+var has = function(set, value)
+{
+	for(ele of set.values())
+		if(ele==value)
+			return true;
+	return false;
+}
+
 var clear = function()
 {
 	grid = new Array(9);
 	for(var i=0; i<9; i++)
 		grid[i] = new Array(9);
+		for(var j=0; j<9; j++)
+			grid[i][j] = new Cell(0,new Set());
 	wrong = [];
 	hist = []
 	pencilmarks = []
@@ -65,12 +76,12 @@ var proposeChange = function(cx,cy,v)
 	    else
 		{
 			//remove any existing errors
-			var ind =  deepFind({x:cx,y:cy,value:grid[cx][cy]},wrong);
+			var ind =  deepFind({x:cx,y:cy,value:grid[cx][cy].value},wrong);
 			if(ind>=0)
 				wrong.splice(ind,1);
 		}
 		hist.push(change);
-		grid[cx][cy] = v;
+		grid[cx][cy].value = v;
 		update();
 		//check if puzzle completed
 		if(checkComplete())
@@ -86,7 +97,7 @@ var checkComplete = function()
 {
 	for(var i=0; i<9; i++)
 		for(var j=0; j<9; j++)
-			if(grid[i][j]==0||getSector(i,j).includes(grid[i][j]))
+			if(grid[i][j].value==0||has(getSector(i,j),grid[i][j].value))
 				return false;
 	return true;
 }
@@ -121,7 +132,7 @@ var update = function(){
 			td.removeAttribute("id");
 			if(row==xCur&&col==yCur)
 				td.id = "selection";
-			else if(deepFind(getChange(row,col,grid[row][col]),wrong)>=0)
+			else if(deepFind(getChange(row,col,grid[row][col].value),wrong)>=0)
 				td.id = "wrong";
 
 			//remove previous number and put in input, if any
@@ -130,7 +141,7 @@ var update = function(){
 			{
 				td.removeChild(textNode);
 				//put new number in cell
-				textNode = document.createTextNode(grid[row][col]===0?"":grid[row][col].toString());
+				textNode = document.createTextNode(grid[row][col].value===0?"":grid[row][col].value.toString());
 				td.className = "guess x"+row+" y"+col;
 				td.appendChild(textNode);
 			}
@@ -151,8 +162,8 @@ var createTable = function()
         for (var j = 0; j < 9; j++) {
             var td = document.createElement('td');
 			//put number in cell if not 0
-			var textNode = document.createTextNode(grid[i][j]===0?"":grid[i][j].toString());
-			if(grid[i][j]!=0)
+			var textNode = document.createTextNode(grid[i][j].value===0?"":grid[i][j].value.toString());
+			if(grid[i][j].value!=0)
 				td.className = "hint x"+i+" y"+j;
 			td.appendChild(textNode);
             tr.appendChild(td);
